@@ -12,11 +12,14 @@ const purchaseSchema = new mongoose.Schema({
   },
   razorpayPaymentId: {
     type: String,
-    required: true,
+    default: '',
   },
   razorpaySignature: {
     type: String,
-    required: true,
+    default: '',
+  },
+  earlyBirdPrice: {
+    type: Number,
   },
   ticketCategory: {
     type: String,

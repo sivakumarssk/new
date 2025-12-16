@@ -53,8 +53,8 @@ function ContactUs() {
                 <span className="text-2xl">📱</span>
                 <div>
                   <h3 className="text-white font-semibold text-sm mb-1">Phone</h3>
-                  <p className="text-gray-300 text-sm">+91 98765 43210</p>
-                  <p className="text-gray-300 text-sm">+91 98765 43211</p>
+                  <p className="text-gray-300 text-sm">+91 7799203333</p>
+                  {/* <p className="text-gray-300 text-sm">+91 98765 43211</p> */}
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -62,9 +62,13 @@ function ContactUs() {
                 <div>
                   <h3 className="text-white font-semibold text-sm mb-1">Address</h3>
                   <p className="text-gray-300 text-sm">
-                    Sky Events Office<br />
-                    Event Management Hub<br />
-                    India
+                    114-2-631/1<br />
+                    Sy No 165 & 166<br />
+                    Krishna Nagar<br />
+                    Rajanagaram Road<br />
+                    Swagat Petrol Bunk<br />
+                    Diwancheruvu<br />
+                    Rajamahendravaram
                   </p>
                 </div>
               </div>

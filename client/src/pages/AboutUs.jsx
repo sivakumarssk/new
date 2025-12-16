@@ -4,6 +4,9 @@ function AboutUs() {
       <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4">
+            SKY DRIVE INN
+          </h2>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             About SKY Events
           </h1>

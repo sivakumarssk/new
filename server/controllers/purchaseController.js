@@ -20,10 +20,18 @@ exports.getAllPurchases = async (req, res) => {
   }
 }
 
-// Download purchases as Excel
+// Download purchases as Excel (only successful payments)
 exports.downloadPurchasesExcel = async (req, res) => {
   try {
-    const purchases = await Purchase.find().sort({ createdAt: -1 })
+    // Only fetch purchases with completed payment status
+    const purchases = await Purchase.find({ paymentStatus: 'completed' }).sort({ createdAt: -1 })
+
+    if (purchases.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No successful payments found',
+      })
+    }
 
     // Prepare data for Excel
     const excelData = purchases.map((purchase) => ({
@@ -35,9 +43,9 @@ exports.downloadPurchasesExcel = async (req, res) => {
       'Ticket Category': purchase.ticketName,
       'Ticket Type': purchase.ticketType,
       'Number of Seats': purchase.ticketSeats,
-      'Ticket Price': purchase.ticketPrice,
+      'Early Bird Price': purchase.earlyBirdPrice || purchase.ticketPrice,
+      'Tax Amount': purchase.taxAmount,
       'Total Amount': purchase.totalAmount,
-      'Payment Status': purchase.paymentStatus,
       'Email Sent': purchase.emailSent ? 'Yes' : 'No',
       'Purchase Date': purchase.createdAt.toLocaleString('en-IN'),
     }))
@@ -56,9 +64,9 @@ exports.downloadPurchasesExcel = async (req, res) => {
       { wch: 15 }, // Ticket Category
       { wch: 10 }, // Ticket Type
       { wch: 15 }, // Number of Seats
-      { wch: 12 }, // Ticket Price
+      { wch: 15 }, // Early Bird Price
+      { wch: 12 }, // Tax Amount
       { wch: 12 }, // Total Amount
-      { wch: 15 }, // Payment Status
       { wch: 12 }, // Email Sent
       { wch: 25 }, // Purchase Date
     ]
@@ -71,7 +79,7 @@ exports.downloadPurchasesExcel = async (req, res) => {
 
     // Set headers
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename=purchases_${Date.now()}.xlsx`)
+    res.setHeader('Content-Disposition', `attachment; filename=successful_purchases_${Date.now()}.xlsx`)
 
     res.send(buffer)
   } catch (error) {

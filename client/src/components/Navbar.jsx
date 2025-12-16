@@ -26,7 +26,7 @@ function Navbar() {
             <img 
               src={logo} 
               alt="Sky Events Logo" 
-              className="h-10 md:h-12 w-auto"
+              className="h-16 md:h-20 w-auto"
             />
             <span className="text-xl md:text-2xl font-bold text-white hidden sm:inline">
               Sky Events New Year Bash

@@ -1,9 +1,31 @@
 const razorpay = require('../config/razorpay')
 const Purchase = require('../models/Purchase')
 const { sendInvoiceEmail } = require('../config/email')
-const crypto = require('crypto')
+const { validatePaymentVerification } = require('razorpay/dist/utils/razorpay-utils')
 
-// Create Order (for UPI payments)
+// Get Razorpay Key
+exports.getKey = (req, res) => {
+  try {
+    const keyId = process.env.RAZORPAY_KEY_ID
+    if (!keyId) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay key not configured. Please set RAZORPAY_KEY_ID in .env file',
+      })
+    }
+    res.status(200).json({
+      key: keyId,
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error getting Razorpay key',
+      error: error.message,
+    })
+  }
+}
+
+// Create Razorpay Order
 exports.createOrder = async (req, res) => {
   try {
     const {
@@ -11,6 +33,7 @@ exports.createOrder = async (req, res) => {
       ticketCategory,
       ticketName,
       ticketPrice,
+      earlyBirdPrice,
       taxAmount,
       totalAmount,
       ticketType,
@@ -18,41 +41,54 @@ exports.createOrder = async (req, res) => {
       customerName,
       customerEmail,
       customerPhone,
-      paymentMethod,
-      paymentStatus,
     } = req.body
 
-    const orderId = `UPI_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    // Create Razorpay order
+    const options = {
+      amount: amount, // amount in paise (currency subunits)
+      currency: 'INR',
+      receipt: `receipt_${Date.now()}_${ticketCategory}`,
+      notes: {
+        ticketCategory: ticketCategory,
+        ticketName: ticketName,
+        customerName: customerName,
+        customerEmail: customerEmail,
+        customerPhone: customerPhone,
+      },
+    }
 
-    // Save purchase record
+    const razorpayOrder = await razorpay.orders.create(options)
+
+    // Save purchase record with pending status
     const purchase = new Purchase({
-      orderId: orderId,
-      razorpayOrderId: orderId,
+      orderId: razorpayOrder.id,
+      razorpayOrderId: razorpayOrder.id,
       ticketCategory,
       ticketName,
       ticketType,
       ticketSeats,
       ticketPrice: ticketPrice || (totalAmount - (taxAmount || 0)),
+      earlyBirdPrice: earlyBirdPrice,
       taxAmount: taxAmount || 0,
       totalAmount: totalAmount || amount / 100,
       customerName,
       customerEmail,
       customerPhone,
-      paymentStatus: paymentStatus || 'pending',
-      razorpayPaymentId: paymentStatus === 'completed' ? `UPI_PAY_${Date.now()}` : '',
-      razorpaySignature: paymentStatus === 'completed' ? 'UPI_PAYMENT' : '',
+      paymentStatus: 'pending',
+      razorpayPaymentId: '',
+      razorpaySignature: '',
     })
 
     await purchase.save()
 
     res.status(200).json({
       success: true,
-      orderId: orderId,
-      amount: amount,
-      currency: 'INR',
+      orderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
     })
   } catch (error) {
-    console.error('Error creating order:', error)
+    console.error('Error creating order:', error.message)
     res.status(500).json({
       success: false,
       message: 'Error creating order',
@@ -61,55 +97,65 @@ exports.createOrder = async (req, res) => {
   }
 }
 
-// Verify Payment (for UPI payments)
+// Verify Razorpay Payment
 exports.verifyPayment = async (req, res) => {
   try {
     const { 
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature,
-      ticketCategory,
-      ticketName,
-      ticketPrice,
-      taxAmount,
-      totalAmount,
-      ticketType,
-      ticketSeats,
-      customerName,
-      customerEmail,
-      customerPhone,
     } = req.body
 
-    // For UPI payments, we don't verify signature
-    // Find or create purchase record
-    let purchase = await Purchase.findOne({ razorpayOrderId: razorpay_order_id })
+    // Find purchase record
+    const purchase = await Purchase.findOne({ razorpayOrderId: razorpay_order_id })
     
     if (!purchase) {
-      // Create new purchase if not found
-      purchase = new Purchase({
-        orderId: razorpay_order_id,
-        razorpayOrderId: razorpay_order_id,
-        ticketCategory,
-        ticketName,
-        ticketType,
-        ticketSeats,
-        ticketPrice: ticketPrice || (totalAmount - (taxAmount || 0)),
-        taxAmount: taxAmount || 0,
-        totalAmount: totalAmount || ticketPrice,
-        customerName,
-        customerEmail,
-        customerPhone,
-        paymentStatus: 'completed',
-        razorpayPaymentId: razorpay_payment_id,
-        razorpaySignature: razorpay_signature,
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
       })
-    } else {
-      // Update existing purchase
-      purchase.razorpayPaymentId = razorpay_payment_id
-      purchase.razorpaySignature = razorpay_signature
-      purchase.paymentStatus = 'completed'
     }
 
+    // Verify signature using Razorpay's official utility
+    const keySecret = process.env.RAZORPAY_KEY_SECRET
+    if (!keySecret) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay secret key not configured',
+      })
+    }
+
+    try {
+      const isValid = validatePaymentVerification(
+        {
+          order_id: razorpay_order_id,
+          payment_id: razorpay_payment_id,
+        },
+        razorpay_signature,
+        keySecret
+      )
+
+      if (!isValid) {
+        purchase.paymentStatus = 'failed'
+        await purchase.save()
+        return res.status(400).json({
+          success: false,
+          message: 'Payment verification failed: Invalid signature',
+        })
+      }
+    } catch (validationError) {
+      purchase.paymentStatus = 'failed'
+      await purchase.save()
+      return res.status(400).json({
+        success: false,
+        message: 'Payment verification failed: ' + validationError.message,
+      })
+    }
+
+    // Update purchase with payment details
+    purchase.razorpayPaymentId = razorpay_payment_id
+    purchase.razorpaySignature = razorpay_signature
+    purchase.paymentStatus = 'completed'
     await purchase.save()
 
     // Send email
@@ -125,7 +171,7 @@ exports.verifyPayment = async (req, res) => {
       purchase,
     })
   } catch (error) {
-    console.error('Error verifying payment:', error)
+    console.error('Error verifying payment:', error.message)
     res.status(500).json({
       success: false,
       message: 'Error verifying payment',

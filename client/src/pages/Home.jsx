@@ -7,12 +7,19 @@ import mipImage from '../assets/mip.png'
 import vvipCoupleImage from '../assets/vvipcouple.png'
 import vip4paxImage from '../assets/vip4pax.png'
 import vvipFamilyImage from '../assets/vvipfamily.jpg'
+// Banner Images and Video
+import banner1 from '../assets/banner1.jpeg'
+import banner2 from '../assets/banner2.jpeg'
+import bannerVideo from '../assets/bannervideo.mp4'
 
 function Home() {
   return (
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-3">
+          SKY DRIVE INN
+        </h2>
         <h1 className="text-6xl font-bold text-white mb-4 animate-pulse">
           🎊 Sky Events New Year Bash 🎊
         </h1>
@@ -73,6 +80,45 @@ function Home() {
               2R43+V75 Rajamahendravaram, Andhra Pradesh
             </p>
           </div>
+
+          {/* Banner Images and Video */}
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-white mb-4 text-center">Event Highlights</h3>
+            
+            {/* Two Banner Images in Flex */}
+            <div className="flex justify-center gap-4 mb-4">
+              <div className="flex-1 rounded-lg max-h-[550px] max-w-[400px] overflow-hidden border-2 border-white/20">
+                <img 
+                  src={banner1} 
+                  alt="Event Banner 1" 
+                  className="w-full h-auto object-fill"
+                />
+              </div>
+              <div className="flex-1 rounded-lg max-h-[550px] max-w-[400px] overflow-hidden border-2 border-white/20">
+                <img 
+                  src={banner2} 
+                  alt="Event Banner 2" 
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Banner Video */}
+            <div className='flex justify-center'>
+            <div className="rounded-lg max-h-[600px] max-w-[600px] overflow-hidden border-2 border-white/20">
+              <video 
+                src={bannerVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className="w-full h-auto"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -93,8 +139,43 @@ function Home() {
           </div>
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">Standard</h2>
-            <p className="text-white font-bold text-xl mb-3">₹699</p>
-            <p className="text-white text-sm mb-4">1 Seat</p>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹699</p>
+              <p className="text-white font-bold text-xl">₹599</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
+            {/* <p className="text-white text-sm mb-4">1 Seat</p> */}
+            <div className="bg-white/20 rounded-lg p-3 mb-3">
+              <p className="text-white font-semibold text-xs mb-2">Includes:</p>
+              <ul className="text-xs text-white space-y-1">
+                <li>• Fireworks Show</li>
+                <li>• Live Music</li>
+              </ul>
+            </div>
+            <p className="text-xs text-white/80">No food included</p>
+          </div>
+        </div>
+
+         {/* Fanpit Card */}
+         <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all">
+          <div className="h-48 w-full overflow-hidden">
+            <img 
+              src={fanpitImage} 
+              alt="Fanpit Package" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none'
+                e.target.parentElement.innerHTML = '<div class="h-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center"><span class="text-6xl">🎸</span></div>'
+              }}
+            />
+          </div>
+          <div className="p-6 text-center">
+            <h2 className="text-2xl font-bold text-white mb-3">Fan Pit</h2>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹1,199</p>
+              <p className="text-white font-bold text-xl">₹999</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
               <ul className="text-xs text-white space-y-1">
@@ -120,9 +201,13 @@ function Home() {
             />
           </div>
           <div className="p-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">VIP</h2>
-            <p className="text-white font-bold text-xl mb-3">₹1,499</p>
-            <p className="text-white text-sm mb-4">1 Seat</p>
+            <h2 className="text-2xl font-bold text-white mb-3">VIP (Single)</h2>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹1,499</p>
+              <p className="text-white font-bold text-xl">₹1,399</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
+            {/* <p className="text-white text-sm mb-4">1 Seat</p> */}
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
               <ul className="text-xs text-white space-y-1">
@@ -135,37 +220,8 @@ function Home() {
           </div>
         </div>
 
-        {/* Fanpit Card */}
-        <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all">
-          <div className="h-48 w-full overflow-hidden">
-            <img 
-              src={fanpitImage} 
-              alt="Fanpit Package" 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.parentElement.innerHTML = '<div class="h-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center"><span class="text-6xl">🎸</span></div>'
-              }}
-            />
-          </div>
-          <div className="p-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">Fanpit</h2>
-            <p className="text-white font-bold text-xl mb-3">₹2,099</p>
-            <p className="text-white text-sm mb-4">1 Seat</p>
-            <div className="bg-white/20 rounded-lg p-3 mb-3">
-              <p className="text-white font-semibold text-xs mb-2">Includes:</p>
-              <ul className="text-xs text-white space-y-1">
-                <li>• Fireworks Show</li>
-                <li>• Live Music</li>
-                <li>• 1 Non-Veg Starter Only</li>
-              </ul>
-            </div>
-            <p className="text-xs text-white/80"> Unlimited Buffet + 1 Non-Veg Starter Only</p>
-          </div>
-        </div>
-
         {/* MIP Card */}
-        <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all">
+        {/* <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all">
           <div className="h-48 w-full overflow-hidden">
             <img 
               src={mipImage} 
@@ -191,7 +247,7 @@ function Home() {
             </div>
             <p className="text-xs text-white/80"> Unlimited Buffet + 1 Non-Veg Starter Only</p>
           </div>
-        </div>
+        </div> */}
 
         {/* VVIP Couple Card */}
         <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all">
@@ -208,7 +264,11 @@ function Home() {
           </div>
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VVIP Couple</h2>
-            <p className="text-white font-bold text-xl mb-3">₹3,499</p>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹3,499</p>
+              <p className="text-white font-bold text-xl">₹3,099</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
             <p className="text-white text-sm mb-4">2 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
@@ -236,8 +296,12 @@ function Home() {
             />
           </div>
           <div className="p-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">VIP (4PAX)</h2>
-            <p className="text-white font-bold text-xl mb-3">₹5,999</p>
+            <h2 className="text-2xl font-bold text-white mb-3">VIP (Family)</h2>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹5,999</p>
+              <p className="text-white font-bold text-xl">₹5,499</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
             <p className="text-white text-sm mb-4">4 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
@@ -266,8 +330,12 @@ function Home() {
           </div>
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VVIP Family</h2>
-            <p className="text-white font-bold text-xl mb-3">₹6,999</p>
-            <p className="text-white text-sm mb-4">4 Seats</p>
+            <div className="mb-3">
+              <p className="text-gray-300 text-sm line-through">₹6,999</p>
+              <p className="text-white font-bold text-xl">₹6,499</p>
+              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+            </div>
+            <p className="text-white text-sm mb-4">3 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
               <ul className="text-xs text-white space-y-1">

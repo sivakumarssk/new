@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import axios from 'axios'
-import { QRCodeSVG } from 'qrcode.react'
 
 const TICKET_CATEGORIES = {
-  'standard-1': { name: 'Standard', price: 699, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
-  'vip-1': { name: 'VIP', price: 1499, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'fanpit-1': { name: 'Fanpit', price: 2099, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'mip-1': { name: 'MIP', price: 2999, type: 'MIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vip-4pax': { name: 'VIP (4PAX)', price: 5999, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-family': { name: 'VVIP (Family)', price: 6999, type: 'VVIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'standard-1': { name: 'Standard', price: 699, earlyBirdPrice: 599, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'fanpit-1': { name: 'Fan Pit', price: 1199, earlyBirdPrice: 999, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'vip-1': { name: 'VIP (Single)', price: 1499, earlyBirdPrice: 1399, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vip-family': { name: 'VIP (Family)', price: 5999, earlyBirdPrice: 5499, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, earlyBirdPrice: 3099, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-family': { name: 'VVIP (Family)', price: 6999, earlyBirdPrice: 6499, type: 'VVIP', seats: 3, features: ['Fireworks Show', 'Live Music', 'Food'] },
 }
 
 const FOOD_DETAILS = {
@@ -32,20 +30,6 @@ const FOOD_DETAILS = {
     title: 'Unlimited Buffet Included',
     items: [
       '2 Non-Veg Starter',
-      '1 Veg Starter',
-      'Prawn Biriyani',
-      'Chicken Curry',
-      'Chicken Fry',
-      'Veg Curry',
-      'Bagar Rice',
-      'Bisebellebath',
-      'Curd Rice',
-    ]
-  },
-  'Fanpit': {
-    title: 'Limited Food Included',
-    items: [
-      '1 Non-Veg Starter',
       '1 Veg Starter',
       'Prawn Biriyani',
       'Chicken Curry',
@@ -80,11 +64,15 @@ const FOOD_DETAILS = {
   }
 }
 
-// Generate UPI string with amount
-const generateUPIString = (amount) => {
-  // Format amount to 2 decimal places (e.g., 699.00)
-  const formattedAmount = amount.toFixed(2)
-  return `upi://pay?ver=01&mode=01&purpose=00&mc=0000&qrMedium=02&pa=9989929886-2@ybl&pn=Sky Events&am=${formattedAmount}&cu=INR`
+// Load Razorpay script
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
 }
 
 function BookingForm() {
@@ -97,16 +85,14 @@ function BookingForm() {
     email: '',
     phone: '',
   })
-  const [showPayment, setShowPayment] = useState(false)
-  const [timeRemaining, setTimeRemaining] = useState(300) // 5 minutes in seconds
-  const [showPaymentButton, setShowPaymentButton] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
 
   const ticket = ticketKey ? TICKET_CATEGORIES[ticketKey] : null
   const foodDetails = ticket ? FOOD_DETAILS[ticket.type] : null
 
-  // Calculate amounts
-  const basePrice = ticket ? ticket.price : 0
+  // Calculate amounts (using early bird price)
+  const basePrice = ticket ? ticket.earlyBirdPrice : 0
   const tax = basePrice * 0.05 // 5% tax
   const totalAmount = basePrice + tax
 
@@ -115,27 +101,6 @@ function BookingForm() {
       navigate('/book-tickets')
     }
   }, [ticket, navigate])
-
-  // Timer for payment
-  useEffect(() => {
-    if (showPayment && timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer)
-            // After 5 minutes, wait 30 seconds then show button
-            setTimeout(() => {
-              setShowPaymentButton(true)
-            }, 30000) // 30 seconds
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-
-      return () => clearInterval(timer)
-    }
-  }, [showPayment, timeRemaining])
 
   if (!ticket) {
     return null
@@ -148,12 +113,6 @@ function BookingForm() {
     })
   }
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -162,37 +121,24 @@ function BookingForm() {
       return
     }
 
-    setShowPayment(true)
-    setTimeRemaining(300) // Reset to 5 minutes
-  }
+    setLoading(true)
 
-  const handlePaymentDone = async () => {
     try {
-      // Save purchase to backend
-      await axios.post('http://localhost:5000/api/payments/create-order', {
-        amount: totalAmount * 100, // Convert to paise
-        ticketCategory: ticketKey,
-        ticketName: ticket.name,
-        ticketPrice: basePrice,
-        taxAmount: tax,
-        totalAmount: totalAmount,
-        ticketType: ticket.type,
-        ticketSeats: ticket.seats,
-        customerName: formData.name,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        paymentMethod: 'UPI',
-        paymentStatus: 'completed',
-      })
+      // Load Razorpay script
+      const razorpayLoaded = await loadRazorpayScript()
+      if (!razorpayLoaded) {
+        alert('Razorpay SDK failed to load. Please check your connection.')
+        setLoading(false)
+        return
+      }
 
-      // Send email
-      await axios.post('http://localhost:5000/api/payments/verify-payment', {
-        razorpay_order_id: `UPI_${Date.now()}`,
-        razorpay_payment_id: `UPI_PAY_${Date.now()}`,
-        razorpay_signature: 'UPI_PAYMENT',
+      // Create order in backend
+      const orderResponse = await axios.post('http://localhost:5000/api/payments/create-order', {
+        amount: Math.round(totalAmount * 100), // Convert to paise
         ticketCategory: ticketKey,
         ticketName: ticket.name,
-        ticketPrice: basePrice,
+        ticketPrice: ticket.price,
+        earlyBirdPrice: ticket.earlyBirdPrice,
         taxAmount: tax,
         totalAmount: totalAmount,
         ticketType: ticket.type,
@@ -202,14 +148,64 @@ function BookingForm() {
         customerPhone: formData.phone,
       })
 
-      setPaymentSubmitted(true)
-      alert('Payment confirmed! Check your email for ticket details.')
-      setTimeout(() => {
-        navigate('/book-tickets')
-      }, 2000)
+      const { orderId, amount, currency } = orderResponse.data
+
+      // Get Razorpay key from backend
+      const keyResponse = await axios.get('http://localhost:5000/api/payments/get-key')
+      const razorpayKey = keyResponse.data.key
+
+      // Open Razorpay Checkout
+      const options = {
+        key: razorpayKey,
+        amount: amount,
+        currency: currency,
+        name: 'Sky Events New Year Bash',
+        description: `Ticket: ${ticket.name}`,
+        order_id: orderId,
+        handler: async function (response) {
+          try {
+            // Verify payment
+            const verifyResponse = await axios.post('http://localhost:5000/api/payments/verify-payment', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            })
+
+            if (verifyResponse.data.success) {
+              setPaymentSubmitted(true)
+              alert('Payment successful! Check your email for ticket details.')
+              setTimeout(() => {
+                navigate('/book-tickets')
+              }, 2000)
+            } else {
+              alert('Payment verification failed. Please contact support.')
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error)
+            alert('Error verifying payment. Please contact support.')
+          }
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#9333ea',
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false)
+          },
+        },
+      }
+
+      const razorpay = new window.Razorpay(options)
+      razorpay.open()
     } catch (error) {
-      console.error('Payment submission error:', error)
-      alert('Error processing payment. Please contact support.')
+      console.error('Payment initiation error:', error)
+      alert('Error initiating payment. Please try again.')
+      setLoading(false)
     }
   }
 
@@ -221,81 +217,6 @@ function BookingForm() {
             <div className="text-6xl mb-4">✅</div>
             <h2 className="text-2xl font-bold text-white mb-4">Payment Confirmed!</h2>
             <p className="text-gray-300">Your ticket has been confirmed. Check your email for details.</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (showPayment) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10 shadow-xl">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Scan & Pay via UPI</h2>
-            
-            {/* QR Code */}
-            <div className="flex justify-center mb-6">
-              <div className="bg-white p-4 rounded-lg">
-                <QRCodeSVG value={generateUPIString(totalAmount)} size={256} />
-              </div>
-            </div>
-
-            {/* Amount Details */}
-            <div className="bg-white/10 rounded-lg p-4 mb-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-white">
-                  <span>Base Price:</span>
-                  <span>₹{basePrice.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-white">
-                  <span>Tax (5%):</span>
-                  <span>₹{tax.toFixed(2)}</span>
-                </div>
-                <div className="border-t border-white/20 pt-2 mt-2">
-                  <div className="flex justify-between text-yellow-400 font-bold text-lg">
-                    <span>Total Amount:</span>
-                    <span>₹{totalAmount.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Timer */}
-            {timeRemaining > 0 && (
-              <div className="text-center mb-6">
-                <p className="text-gray-300 mb-2">Time remaining to complete payment:</p>
-                <p className="text-3xl font-bold text-yellow-400">{formatTime(timeRemaining)}</p>
-              </div>
-            )}
-
-            {/* Payment Done Button */}
-            {showPaymentButton && (
-              <div className="text-center">
-                <p className="text-gray-300 mb-4">Have you completed the payment?</p>
-                <button
-                  onClick={handlePaymentDone}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Payment Done
-                </button>
-              </div>
-            )}
-
-            {!showPaymentButton && timeRemaining === 0 && (
-              <div className="text-center">
-                <p className="text-gray-300 mb-4">Please wait...</p>
-              </div>
-            )}
-
-            <div className="text-center mt-6">
-              <button
-                onClick={() => setShowPayment(false)}
-                className="text-yellow-400 hover:text-yellow-300 text-sm"
-              >
-                ← Back to Form
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -327,8 +248,14 @@ function BookingForm() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <p className="text-white font-bold text-xl mb-1">{ticket.name}</p>
-                    <p className="text-gray-300 text-sm mb-2">{ticket.seats} Seat{ticket.seats > 1 ? 's' : ''}</p>
-                    <p className="text-yellow-400 font-bold text-2xl">₹{basePrice.toLocaleString()}</p>
+                    {ticket.seats > 1 && (
+                      <p className="text-gray-300 text-sm mb-2">{ticket.seats} Seats</p>
+                    )}
+                    <div>
+                      <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
+                      <p className="text-yellow-400 font-bold text-2xl">₹{basePrice.toLocaleString()}</p>
+                      <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                    </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     ticket.type === 'VVIP' ? 'bg-yellow-400/20 text-yellow-400' :
@@ -415,7 +342,7 @@ function BookingForm() {
                     <span>₹{basePrice.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-white text-sm">
-                    <span>Tax (5%):</span>
+                    <span>GST (5%):</span>
                     <span>₹{tax.toFixed(2)}</span>
                   </div>
                   <div className="border-t border-white/20 pt-2 mt-2">
@@ -431,9 +358,10 @@ function BookingForm() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold py-3 px-6 rounded-lg hover:from-yellow-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold py-3 px-6 rounded-lg hover:from-yellow-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Proceed to Payment
+                  {loading ? 'Processing...' : 'Proceed to Payment'}
                 </button>
               </form>
             </div>

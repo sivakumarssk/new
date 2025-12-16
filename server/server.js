@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+
 require('dotenv').config()
 
 const app = express()
@@ -15,7 +16,7 @@ app.use('/api/payments', require('./routes/paymentRoutes'))
 app.use('/api/purchases', require('./routes/purchaseRoutes'))
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/skyevents'
+const MONGODB_URI = process.env.MONGODB_URI
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
   .catch((err) => console.error('MongoDB connection error:', err))
