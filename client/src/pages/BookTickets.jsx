@@ -11,6 +11,7 @@ import vvipFamilyImage from '../assets/vvipfamily.jpg'
 import banner1 from '../assets/banner1.jpeg'
 import banner2 from '../assets/banner2.jpeg'
 import bannerVideo from '../assets/bannervideo.mp4'
+import calendarIcon from '../assets/calendar.png'
 
 const PACKAGE_IMAGES = {
   'standard-1': standardImage,
@@ -126,7 +127,7 @@ function BookTickets() {
         <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-center gap-4">
-              <span className="text-4xl">📅</span>
+            <span><img className='w-12 h-12' src={calendarIcon} alt="Date" /></span>
               <div>
                 <h3 className="text-lg font-bold text-white mb-1">Date & Time</h3>
                 <p className="text-gray-200">31st December 2025</p>
@@ -137,7 +138,10 @@ function BookTickets() {
               <span className="text-4xl">📍</span>
               <div>
                 <h3 className="text-lg font-bold text-white mb-1">Location</h3>
-                <p className="text-gray-200">Rajamahendravaram, Andhra Pradesh</p>
+                <p className="text-gray-200">JN Road, <br />
+                Manayam Ground, <br />
+                Rajamahendravaram,
+                Andhra Pradesh </p>
                 <p className="text-sm text-gray-300">2R43+V75</p>
               </div>
             </div>

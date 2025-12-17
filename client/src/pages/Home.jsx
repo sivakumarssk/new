@@ -11,6 +11,7 @@ import vvipFamilyImage from '../assets/vvipfamily.jpg'
 import banner1 from '../assets/banner1.jpeg'
 import banner2 from '../assets/banner2.jpeg'
 import bannerVideo from '../assets/bannervideo.mp4'
+import calendarIcon from '../assets/calendar.png'
 
 function Home() {
   return (
@@ -41,7 +42,7 @@ function Home() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                <span className="text-4xl">📅</span>
+                <span><img className='w-12 h-12' src={calendarIcon} alt="Date" /></span>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-1">Date & Time</h3>
                   <p className="text-lg text-gray-200">31st December 2025</p>
@@ -54,8 +55,10 @@ function Home() {
                 <span className="text-4xl">📍</span>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-1">Location</h3>
-                  <p className="text-lg text-gray-200">Rajamahendravaram</p>
-                  <p className="text-lg text-gray-200">Andhra Pradesh</p>
+                  <p className="text-gray-200">JN Road, <br />
+                Manayam Ground, <br />
+                Rajamahendravaram,
+                Andhra Pradesh </p>
                 </div>
               </div>
             </div>
@@ -91,7 +94,7 @@ function Home() {
                 <img 
                   src={banner1} 
                   alt="Event Banner 1" 
-                  className="w-full h-auto object-fill"
+                  className="w-full h-full object-fill"
                 />
               </div>
               <div className="flex-1 rounded-lg max-h-[550px] max-w-[400px] overflow-hidden border-2 border-white/20">
