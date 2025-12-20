@@ -38,6 +38,12 @@ const purchaseSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 1,
+    min: 1,
+  },
   ticketPrice: {
     type: Number,
     required: true,

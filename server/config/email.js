@@ -164,7 +164,9 @@ const sendInvoiceEmail = async (purchase) => {
   `
 
     // Calculate pricing breakdown
-    const basePrice = purchase.earlyBirdPrice || purchase.ticketPrice || 0
+    const quantity = purchase.quantity || 1
+    const pricePerTicket = purchase.earlyBirdPrice || purchase.ticketPrice || 0
+    const basePrice = pricePerTicket * quantity
     const tax = purchase.taxAmount || 0
     const total = purchase.totalAmount || 0
 
@@ -175,6 +177,7 @@ const sendInvoiceEmail = async (purchase) => {
     const safeOrderId = (purchase.orderId || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     const safePaymentId = (purchase.razorpayPaymentId || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     const safeTicketSeats = purchase.ticketSeats || 1
+    const safeQuantity = purchase.quantity || 1
 
     console.log('📧 Email template variables prepared successfully')
 
@@ -222,8 +225,16 @@ ${imageTag}
 <td style="padding:10px 0;border-bottom:1px solid #dbeafe;text-align:right;color:#1f2937">${safeTicketType}</td>
 </tr>
 <tr>
-<td style="padding:10px 0;border-bottom:1px solid #dbeafe"><strong style="color:#1e40af">Number of Seats:</strong></td>
+<td style="padding:10px 0;border-bottom:1px solid #dbeafe"><strong style="color:#1e40af">Quantity:</strong></td>
+<td style="padding:10px 0;border-bottom:1px solid #dbeafe;text-align:right;color:#1f2937">${safeQuantity}</td>
+</tr>
+<tr>
+<td style="padding:10px 0;border-bottom:1px solid #dbeafe"><strong style="color:#1e40af">Number of Seats per Ticket:</strong></td>
 <td style="padding:10px 0;border-bottom:1px solid #dbeafe;text-align:right;color:#1f2937">${safeTicketSeats}</td>
+</tr>
+<tr>
+<td style="padding:10px 0;border-bottom:1px solid #dbeafe"><strong style="color:#1e40af">Total Seats:</strong></td>
+<td style="padding:10px 0;border-bottom:1px solid #dbeafe;text-align:right;color:#1f2937">${safeQuantity * safeTicketSeats}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;border-bottom:1px solid #dbeafe"><strong style="color:#1e40af">Order ID:</strong></td>
@@ -262,10 +273,21 @@ ${foodItems}
 <td style="padding:20px">
 <h3 style="margin:0 0 15px 0;font-size:18px;color:#92400e">💰 Payment Details</h3>
 <table width="100%" cellpadding="0" cellspacing="0">
+${quantity > 1 ? `<tr>
+<td style="padding:8px 0;color:#92400e">Price per Ticket (Early Bird):</td>
+<td style="padding:8px 0;text-align:right;color:#92400e">₹${pricePerTicket.toLocaleString()}</td>
+</tr>
 <tr>
+<td style="padding:8px 0;color:#92400e">Quantity:</td>
+<td style="padding:8px 0;text-align:right;color:#92400e">${quantity}</td>
+</tr>
+<tr>
+<td style="padding:8px 0;color:#92400e">Subtotal:</td>
+<td style="padding:8px 0;text-align:right;color:#92400e">₹${basePrice.toLocaleString()}</td>
+</tr>` : `<tr>
 <td style="padding:8px 0;color:#92400e">Package Price (Early Bird):</td>
 <td style="padding:8px 0;text-align:right;color:#92400e">₹${basePrice.toLocaleString()}</td>
-</tr>
+</tr>`}
 <tr>
 <td style="padding:8px 0;color:#92400e">Tax (5%):</td>
 <td style="padding:8px 0;text-align:right;color:#92400e">₹${tax.toLocaleString()}</td>

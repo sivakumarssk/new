@@ -42,8 +42,9 @@ exports.downloadPurchasesExcel = async (req, res) => {
       'Customer Phone': purchase.customerPhone,
       'Ticket Category': purchase.ticketName,
       'Ticket Type': purchase.ticketType,
+      'Quantity': purchase.quantity || 1,
       'Number of Seats': purchase.ticketSeats,
-      'Early Bird Price': purchase.earlyBirdPrice || purchase.ticketPrice,
+      'Price Per Ticket': purchase.earlyBirdPrice || purchase.ticketPrice,
       'Tax Amount': purchase.taxAmount,
       'Total Amount': purchase.totalAmount,
       'Email Sent': purchase.emailSent ? 'Yes' : 'No',
@@ -63,8 +64,9 @@ exports.downloadPurchasesExcel = async (req, res) => {
       { wch: 15 }, // Customer Phone
       { wch: 15 }, // Ticket Category
       { wch: 10 }, // Ticket Type
+      { wch: 10 }, // Quantity
       { wch: 15 }, // Number of Seats
-      { wch: 15 }, // Early Bird Price
+      { wch: 15 }, // Price Per Ticket
       { wch: 12 }, // Tax Amount
       { wch: 12 }, // Total Amount
       { wch: 12 }, // Email Sent

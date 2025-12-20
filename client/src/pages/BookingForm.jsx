@@ -85,6 +85,7 @@ function BookingForm() {
     email: '',
     phone: '',
   })
+  const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
 
@@ -92,7 +93,8 @@ function BookingForm() {
   const foodDetails = ticket ? FOOD_DETAILS[ticket.type] : null
 
   // Calculate amounts (using early bird price)
-  const basePrice = ticket ? ticket.earlyBirdPrice : 0
+  const basePricePerTicket = ticket ? ticket.earlyBirdPrice : 0
+  const basePrice = basePricePerTicket * quantity
   const tax = basePrice * 0.05 // 5% tax
   const totalAmount = basePrice + tax
 
@@ -133,7 +135,7 @@ function BookingForm() {
       }
 
       // Create order in backend
-      const orderResponse = await axios.post('http://localhost:5000/api/payments/create-order', {
+      const orderResponse = await axios.post('https://skynewyearbash.com/api/payments/create-order', {
         amount: Math.round(totalAmount * 100), // Convert to paise
         ticketCategory: ticketKey,
         ticketName: ticket.name,
@@ -143,6 +145,7 @@ function BookingForm() {
         totalAmount: totalAmount,
         ticketType: ticket.type,
         ticketSeats: ticket.seats,
+        quantity: quantity,
         customerName: formData.name,
         customerEmail: formData.email,
         customerPhone: formData.phone,
@@ -151,7 +154,7 @@ function BookingForm() {
       const { orderId, amount, currency } = orderResponse.data
 
       // Get Razorpay key from backend
-      const keyResponse = await axios.get('http://localhost:5000/api/payments/get-key')
+      const keyResponse = await axios.get('https://skynewyearbash.com/api/payments/get-key')
       const razorpayKey = keyResponse.data.key
 
       // Open Razorpay Checkout
@@ -160,12 +163,12 @@ function BookingForm() {
         amount: amount,
         currency: currency,
         name: 'Sky Events New Year Bash',
-        description: `Ticket: ${ticket.name}`,
+        description: `Ticket: ${ticket.name} (Qty: ${quantity})`,
         order_id: orderId,
         handler: async function (response) {
           try {
             // Verify payment
-            const verifyResponse = await axios.post('http://localhost:5000/api/payments/verify-payment', {
+            const verifyResponse = await axios.post('https://skynewyearbash.com/api/payments/verify-payment', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -253,8 +256,8 @@ function BookingForm() {
                     )}
                     <div>
                       <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
-                      <p className="text-yellow-400 font-bold text-2xl">₹{basePrice.toLocaleString()}</p>
-                      <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                      <p className="text-yellow-400 font-bold text-2xl">₹{basePricePerTicket.toLocaleString()}</p>
+                      <p className="text-green-400 text-xs mt-1">Early Bird Price (per ticket)</p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -335,10 +338,59 @@ function BookingForm() {
                   />
                 </div>
 
+                {/* Quantity Selector */}
+                <div>
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    Quantity
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 rounded-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 flex items-center justify-center font-bold text-lg"
+                      disabled={quantity <= 1}
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 1
+                        setQuantity(Math.max(1, Math.min(50, val)))
+                      }}
+                      className="w-20 px-4 py-2.5 rounded-lg bg-white/10 text-white border border-white/20 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 text-center font-semibold"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.min(50, quantity + 1))}
+                      className="w-10 h-10 rounded-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 flex items-center justify-center font-bold text-lg"
+                      disabled={quantity >= 50}
+                    >
+                      +
+                    </button>
+                    <span className="text-gray-300 text-sm ml-2">
+                      {quantity} {quantity === 1 ? 'ticket' : 'tickets'}
+                    </span>
+                  </div>
+                </div>
+
                 {/* Price Breakdown */}
                 <div className="bg-white/10 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-white text-sm">
-                    <span>Base Price:</span>
+                    <span>Price per ticket:</span>
+                    <span>₹{basePricePerTicket.toLocaleString()}</span>
+                  </div>
+                  {quantity > 1 && (
+                    <div className="flex justify-between text-white text-sm">
+                      <span>Quantity:</span>
+                      <span>{quantity} × ₹{basePricePerTicket.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-white text-sm">
+                    <span>Subtotal:</span>
                     <span>₹{basePrice.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-white text-sm">
