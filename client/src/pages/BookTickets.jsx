@@ -23,12 +23,12 @@ const PACKAGE_IMAGES = {
 }
 
 const TICKET_CATEGORIES = {
-  'standard-1': { name: 'Standard', price: 699, earlyBirdPrice: 599, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
-  'fanpit-1': { name: 'Fan Pit', price: 1199, earlyBirdPrice: 999, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music'] },
-  'vip-1': { name: 'VIP (Single)', price: 1499, earlyBirdPrice: 1399, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vip-family': { name: 'VIP (Family)', price: 5999, earlyBirdPrice: 5499, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, earlyBirdPrice: 3099, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-family': { name: 'VVIP (Family)', price: 6999, earlyBirdPrice: 6499, type: 'VVIP', seats: 3, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'standard-1': { name: 'Standard', price: 699, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'fanpit-1': { name: 'Fan Pit', price: 1999, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'vip-1': { name: 'VIP (Single)', price: 1499, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vip-family': { name: 'VIP (Family)', price: 5999, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-family': { name: 'VVIP (Family)', price: 6999, type: 'VVIP', seats: 3, features: ['Fireworks Show', 'Live Music', 'Food'] },
 }
 
 const FOOD_DETAILS = {
@@ -240,9 +240,7 @@ function BookTickets() {
                     <p className="text-white font-bold text-lg mb-1">{ticket.seats} Seats</p>
                   )}
                   <div className="mb-3">
-                    <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
-                    <p className="text-blue-400 font-bold text-xl">₹{ticket.earlyBirdPrice.toLocaleString()}</p>
-                    <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                    <p className="text-blue-400 font-bold text-xl">₹{ticket.price.toLocaleString()}</p>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3 mb-3">
                     <p className="text-white text-xs font-semibold mb-2">Includes:</p>
@@ -294,9 +292,7 @@ function BookTickets() {
                     <p className="text-white font-bold text-lg mb-1">{ticket.seats} Seats</p>
                   )}
                     <div className="mb-3">
-                      <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
-                      <p className="text-green-400 font-bold text-xl">₹{ticket.earlyBirdPrice.toLocaleString()}</p>
-                      <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                      <p className="text-green-400 font-bold text-xl">₹{ticket.price.toLocaleString()}</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3 mb-3">
                       <p className="text-white text-xs font-semibold mb-2">Includes:</p>
@@ -348,9 +344,7 @@ function BookTickets() {
                     <p className="text-white font-bold text-lg mb-1">{ticket.seats} Seats</p>
                   )}
                   <div className="mb-3">
-                    <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
-                    <p className="text-purple-400 font-bold text-xl">₹{ticket.earlyBirdPrice.toLocaleString()}</p>
-                    <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                    <p className="text-purple-400 font-bold text-xl">₹{ticket.price.toLocaleString()}</p>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3 mb-3">
                     <p className="text-white text-xs font-semibold mb-2">Includes:</p>
@@ -401,9 +395,7 @@ function BookTickets() {
                     <p className="text-white font-bold text-lg mb-1">{ticket.seats} Seats</p>
                   )}
                   <div className="mb-3">
-                    <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
-                    <p className="text-yellow-400 font-bold text-xl">₹{ticket.earlyBirdPrice.toLocaleString()}</p>
-                    <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+                    <p className="text-yellow-400 font-bold text-xl">₹{ticket.price.toLocaleString()}</p>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3 mb-3">
                     <p className="text-white text-xs font-semibold mb-2">Includes:</p>

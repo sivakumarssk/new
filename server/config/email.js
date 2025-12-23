@@ -165,7 +165,7 @@ const sendInvoiceEmail = async (purchase) => {
 
     // Calculate pricing breakdown
     const quantity = purchase.quantity || 1
-    const pricePerTicket = purchase.earlyBirdPrice || purchase.ticketPrice || 0
+    const pricePerTicket = purchase.ticketPrice || 0
     const basePrice = pricePerTicket * quantity
     const tax = purchase.taxAmount || 0
     const total = purchase.totalAmount || 0
@@ -274,7 +274,7 @@ ${foodItems}
 <h3 style="margin:0 0 15px 0;font-size:18px;color:#92400e">💰 Payment Details</h3>
 <table width="100%" cellpadding="0" cellspacing="0">
 ${quantity > 1 ? `<tr>
-<td style="padding:8px 0;color:#92400e">Price per Ticket (Early Bird):</td>
+<td style="padding:8px 0;color:#92400e">Price per Ticket:</td>
 <td style="padding:8px 0;text-align:right;color:#92400e">₹${pricePerTicket.toLocaleString()}</td>
 </tr>
 <tr>
@@ -285,7 +285,7 @@ ${quantity > 1 ? `<tr>
 <td style="padding:8px 0;color:#92400e">Subtotal:</td>
 <td style="padding:8px 0;text-align:right;color:#92400e">₹${basePrice.toLocaleString()}</td>
 </tr>` : `<tr>
-<td style="padding:8px 0;color:#92400e">Package Price (Early Bird):</td>
+<td style="padding:8px 0;color:#92400e">Package Price:</td>
 <td style="padding:8px 0;text-align:right;color:#92400e">₹${basePrice.toLocaleString()}</td>
 </tr>`}
 <tr>

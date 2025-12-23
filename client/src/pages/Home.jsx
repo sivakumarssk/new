@@ -143,9 +143,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">Standard</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹699</p>
-              <p className="text-white font-bold text-xl">₹599</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹699</p>
             </div>
             {/* <p className="text-white text-sm mb-4">1 Seat</p> */}
             <div className="bg-white/20 rounded-lg p-3 mb-3">
@@ -175,9 +173,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">Fan Pit</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹1,199</p>
-              <p className="text-white font-bold text-xl">₹999</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹1,999</p>
             </div>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-white font-semibold text-xs mb-2">Includes:</p>
@@ -206,9 +202,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VIP (Single)</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹1,499</p>
-              <p className="text-white font-bold text-xl">₹1,399</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹1,499</p>
             </div>
             {/* <p className="text-white text-sm mb-4">1 Seat</p> */}
             <div className="bg-white/20 rounded-lg p-3 mb-3">
@@ -268,9 +262,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VVIP Couple</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹3,499</p>
-              <p className="text-white font-bold text-xl">₹3,099</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹3,499</p>
             </div>
             <p className="text-white text-sm mb-4">2 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
@@ -301,9 +293,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VIP (Family)</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹5,999</p>
-              <p className="text-white font-bold text-xl">₹5,499</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹5,999</p>
             </div>
             <p className="text-white text-sm mb-4">4 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
@@ -334,9 +324,7 @@ function Home() {
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">VVIP Family</h2>
             <div className="mb-3">
-              <p className="text-gray-300 text-sm line-through">₹6,999</p>
-              <p className="text-white font-bold text-xl">₹6,499</p>
-              <p className="text-green-400 text-xs mt-1">Early Bird Price</p>
+              <p className="text-white font-bold text-xl">₹6,999</p>
             </div>
             <p className="text-white text-sm mb-4">3 Seats</p>
             <div className="bg-white/20 rounded-lg p-3 mb-3">

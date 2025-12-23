@@ -3,12 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 
 const TICKET_CATEGORIES = {
-  'standard-1': { name: 'Standard', price: 699, earlyBirdPrice: 599, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
-  'fanpit-1': { name: 'Fan Pit', price: 1199, earlyBirdPrice: 999, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music'] },
-  'vip-1': { name: 'VIP (Single)', price: 1499, earlyBirdPrice: 1399, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vip-family': { name: 'VIP (Family)', price: 5999, earlyBirdPrice: 5499, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, earlyBirdPrice: 3099, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
-  'vvip-family': { name: 'VVIP (Family)', price: 6999, earlyBirdPrice: 6499, type: 'VVIP', seats: 3, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'standard-1': { name: 'Standard', price: 699, type: 'Standard', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'fanpit-1': { name: 'Fan Pit', price: 1999, type: 'Fanpit', seats: 1, features: ['Fireworks Show', 'Live Music'] },
+  'vip-1': { name: 'VIP (Single)', price: 1499, type: 'VIP', seats: 1, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vip-family': { name: 'VIP (Family)', price: 5999, type: 'VIP', seats: 4, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-couple': { name: 'VVIP (Couple)', price: 3499, type: 'VVIP', seats: 2, features: ['Fireworks Show', 'Live Music', 'Food'] },
+  'vvip-family': { name: 'VVIP (Family)', price: 6999, type: 'VVIP', seats: 3, features: ['Fireworks Show', 'Live Music', 'Food'] },
 }
 
 const FOOD_DETAILS = {
@@ -92,8 +92,8 @@ function BookingForm() {
   const ticket = ticketKey ? TICKET_CATEGORIES[ticketKey] : null
   const foodDetails = ticket ? FOOD_DETAILS[ticket.type] : null
 
-  // Calculate amounts (using early bird price)
-  const basePricePerTicket = ticket ? ticket.earlyBirdPrice : 0
+  // Calculate amounts
+  const basePricePerTicket = ticket ? ticket.price : 0
   const basePrice = basePricePerTicket * quantity
   const tax = basePrice * 0.05 // 5% tax
   const totalAmount = basePrice + tax
@@ -140,7 +140,6 @@ function BookingForm() {
         ticketCategory: ticketKey,
         ticketName: ticket.name,
         ticketPrice: ticket.price,
-        earlyBirdPrice: ticket.earlyBirdPrice,
         taxAmount: tax,
         totalAmount: totalAmount,
         ticketType: ticket.type,
@@ -255,9 +254,8 @@ function BookingForm() {
                       <p className="text-gray-300 text-sm mb-2">{ticket.seats} Seats</p>
                     )}
                     <div>
-                      <p className="text-gray-400 text-sm line-through">₹{ticket.price.toLocaleString()}</p>
                       <p className="text-yellow-400 font-bold text-2xl">₹{basePricePerTicket.toLocaleString()}</p>
-                      <p className="text-green-400 text-xs mt-1">Early Bird Price (per ticket)</p>
+                      <p className="text-gray-400 text-xs mt-1">per ticket</p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -384,15 +382,17 @@ function BookingForm() {
                     <span>₹{basePricePerTicket.toLocaleString()}</span>
                   </div>
                   {quantity > 1 && (
-                    <div className="flex justify-between text-white text-sm">
-                      <span>Quantity:</span>
-                      <span>{quantity} × ₹{basePricePerTicket.toLocaleString()}</span>
-                    </div>
+                    <>
+                      <div className="flex justify-between text-white text-sm">
+                        <span>Quantity:</span>
+                        <span>{quantity} × ₹{basePricePerTicket.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-white text-sm">
+                        <span>Subtotal:</span>
+                        <span>₹{basePrice.toLocaleString()}</span>
+                      </div>
+                    </>
                   )}
-                  <div className="flex justify-between text-white text-sm">
-                    <span>Subtotal:</span>
-                    <span>₹{basePrice.toLocaleString()}</span>
-                  </div>
                   <div className="flex justify-between text-white text-sm">
                     <span>GST (5%):</span>
                     <span>₹{tax.toFixed(2)}</span>

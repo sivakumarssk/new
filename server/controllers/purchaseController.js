@@ -44,7 +44,7 @@ exports.downloadPurchasesExcel = async (req, res) => {
       'Ticket Type': purchase.ticketType,
       'Quantity': purchase.quantity || 1,
       'Number of Seats': purchase.ticketSeats,
-      'Price Per Ticket': purchase.earlyBirdPrice || purchase.ticketPrice,
+      'Price Per Ticket': purchase.ticketPrice,
       'Tax Amount': purchase.taxAmount,
       'Total Amount': purchase.totalAmount,
       'Email Sent': purchase.emailSent ? 'Yes' : 'No',
